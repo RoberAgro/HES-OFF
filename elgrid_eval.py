@@ -3,6 +3,86 @@
 import numpy as np
 
 
+class ES:
+    '''
+    The ES object defines and stores parameters of an energy storage system
+
+    Parameters
+    ----------
+    powerCharge : float
+        Rated power for charging in Watts.
+    powerDisch : float
+        Rated power for discharging in Watts.        
+            
+    '''
+    def __init__(self, powerCharge, powerDisch):
+        self.__initComplete = False
+        self.powerCharge = powerCharge
+        self.powerDisch = powerDisch
+
+        self.__initComplete = True
+
+    @property
+    def powerCharge(self):
+        return self.__powerCharge
+
+    @powerCharge.setter
+    def powerCharge(self, powerCharge):
+        if powerCharge < 0:
+            raise ValueError("ES powerCharge must be positive.")
+        self.__powerCharge = powerCharge
+
+    @property
+    def powerDisch(self):
+        return self.__powerDisch
+
+    @powerDisch.setter
+    def powerDisch(self, powerDisch):
+        if powerDisch < 0:
+            raise ValueError("ES powerDisch must be positive.")
+        self.__powerDisch = powerDisch
+
+
+class LD:
+    '''
+    The LD object defines and stores parameters of electric loads
+
+    Parameters
+    ----------
+    continuous : float
+        Rated power of continuous loads in Watts.
+    flexible : float
+        Rated power of flexible loads in Watts.        
+            
+    '''
+    def __init__(self, continuous, flexible):
+        self.__initComplete = False
+        self.continuous = continuous
+        self.flexible = flexible
+
+        self.__initComplete = True
+
+    @property
+    def continuous(self):
+        return self.__continuous
+
+    @continuous.setter
+    def powerCharge(self, continuous):
+        if continuous < 0:
+            raise ValueError("LD continuous must be positive.")
+        self.__continuous = continuous
+
+    @property
+    def flexible(self):
+        return self.__flexible
+
+    @flexible.setter
+    def flexible(self, flexible):
+        if flexible < 0:
+            raise ValueError("LD flexible must be positive.")
+        self.__flexible = flexible
+
+
 class GT:
     '''
     The GT object defines and stores parameters of a gas turbine
@@ -144,12 +224,12 @@ class WT:
 
     def powerCurve(self, windSpeed):
         '''
-        Given the wind speed, provides the output power.
+        Given the wind speed at hub height, provides the output power.
 
         Parameters
         ----------
         windSpeed : float
-            The wind speed in meters per second.
+            The wind speed at hub height in meters per second.
 
         Returns
         ----------
@@ -179,14 +259,3 @@ class WT:
             self.__outPower = [0, 0.029, 0.0725, 0.1304, 0.2101, 0.3261, 0.4638, 0.6232, 0.7754, 0.8913, 0.9565, 0.9855, 1, 1, 0]
         else:
             raise ValueError("WT model is invalid.")
-
-
-testGT = GT('LM2500', 10e6, 30e6)
-print(testGT.inertia)
-
-testGT.outMin = 20e6
-
-print(testGT.outMin)
-
-testWT = WT('Hywind')
-print(testWT.powerCurve(35))
