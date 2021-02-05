@@ -82,7 +82,7 @@ class GT:
     inertia : float
         Inertia constant of the turbogenerator in seconds.
     rocP : float
-        Maximum rate of change of power in pu of powerRated per second.
+        Maximum rate of change of power in per unit of powerRated per second.
     
     '''
 
@@ -348,16 +348,20 @@ class WT:
         
 
 
-def elgridEval(freqMax, freqMin, GT, WT, ES, LD):
+def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, freqTrMin=-0.05):
     '''
-    For a given configuration (defined by the array of objects GT, WT, ES, LD), checks the frequency stability of the electrical grid.  
+    For a given configuration (defined by the array of objects GT, WT, ES, LD), evaluates the frequency stability of the electrical grid.  
 
     Parameters
     ----------
-    freqMax: float
-        Maximum frequency allowed in per unit.
-    freqMin: float
-        Minimum frequency allowed in per unit.        
+    freqSSMax: float
+        Maximum steady-state frequency deviation allowed in per unit.
+    freqSSMin: float
+        Minimum steady-state frequency deviation allowed in per unit.        
+    freqTrMax: float
+        Maximum transient frequency deviation allowed in per unit.
+    freqTrMin: float
+        Minimum transient frequency deviation allowed in per unit.        
     GT : GT
         Array of gas turbine objects.
     WT : WT
@@ -380,48 +384,108 @@ def elgridEval(freqMax, freqMin, GT, WT, ES, LD):
     powerGTpu = 0
     inertiaGTpu = 0
     rocPGTpu = 1e20
+    dampGTpu = 0
     for _ in GT:
         powerGTpu += _.powerOut
-        inertiaGTpu += _.inertia
+        inertiaGTpu += _.inertia * _.powerRated
         rocPGTpu = min(rocPGTpu, _.rocP * _.powerRated)
+        dampGTpu = (_.outMax - _.outMin) / ( 2*max(-freqSSMin, freqSSMax) )
     powerGTpu /= SBASE
-    inertiaGTpu *= _.powerRated / SBASE
+    inertiaGTpu /= SBASE
     rocPGTpu /= SBASE
+    dampGTpu /= SBASE
         
     # Calculation of WTs aggregated values     
     powerWTpu = 0
-    maxpowerOutStepWT = 0
+    PbNegWT = 0
     for _ in WT:
         powerWTpu += _.powerOut()
-        maxpowerOutStepWT = max(maxpowerOutStepWT, _.powerOut())
+        PbNegWT = max(PbNegWT, _.powerOut())
     powerWTpu /= SBASE
-    maxpowerOutStepWT /= SBASE 
+    PbNegWT /= SBASE 
              
     # Calculation of ESs aggregated values     
     powerESpu = 0
-    maxpowerOutStepES = 0
-    maxpowerInStepES = 0
+    PbNegES = 0
+    PbPosES = 0
     for _ in ES:
         powerESpu += _.powerIn
         if _.powerIn < 0:
-            maxpowerOutStepES = max(maxpowerOutStepES, -_.powerIn)
+            PbNegES = max(PbNegES, -_.powerIn)
         else:
-            maxpowerInStepES = max(maxpowerInStepES, _.powerIn)
+            PbPosES = max(PbPosES, _.powerIn)
     powerESpu /= SBASE
-    maxpowerOutStepES /= SBASE 
-    maxpowerInStepES /= SBASE
+    PbNegES /= SBASE 
+    PbPosES /= SBASE
     
-    # Calculation of ESs aggregated values     
+    # Calculation of LDs aggregated values     
     powerLDpu = 0
+    PbNegLD = 0
+    PbPosLD = 0
     for _ in LD:
         powerLDpu += _.powerIn
+        if _.powerIn > (_.continuous - _.largest):
+            PbPosLD = max(PbPosLD, _.largest)
+            PbNegLD = max(PbNegLD, _.continuous - _.powerIn)
+        else:
+            PbPosLD = max(PbPosLD, _.powerIn)
+            PbNegLD = max(PbNegLD, _.largest)
+
     powerLDpu /= SBASE
+    PbNegLD /= SBASE 
+    PbPosLD /= SBASE
 
-    # Calculate the worst possible load increase   
-        
-        
-        
-        
+    # Check worst negative power imbalance (load > generation)
+    PbNeg = max(PbNegWT, PbNegES, PbNegLD)
+    
+    PbNegMax = freqEval(freqSS=-freqSSMin, freqTr=-freqTrMin, Dmin=dampGTpu)
+    
+    print(PbNeg)
+    print(PbNegMax)
 
-        
+    # Check worst positive power imbalance (load < generation)
+    PbPos = max(PbPosES, PbPosLD)
+    PbPosMax = freqEval(freqSS=freqSSMax, freqTr=freqTrMax, Dmin=dampGTpu)
 
+    print(PbPos)
+    print(PbPosMax)
+        
+        
+def freqEval(freqSS=0, freqTr=0, Dmin=0, Pb=0):
+    '''
+    Evaluates the frequency stability of an electrical grid as described in https://doi.org/10.1109/TPWRS.2020.3039832    
+
+    Parameters
+    ----------
+    freqSS: float
+        Maximum steady-state frequency deviation in per unit.
+    freqTr: float
+        Maximum transient frequency deviation in per unit.
+    Dmin: float
+        Minimum system damping in per unit.
+    Dmin: float
+        Maximum active power disturbance in per unit.
+
+    Returns
+    ----------
+    The parameter not defined.
+    Raises error if all parameters are defined or more than one is not defined. 
+
+    '''
+    
+    if (freqSS, freqTr, Dmin, Pb).count(0) > 1:
+        raise ValueError("freqEval() invalid use.") 
+    
+    if freqSS == 0:
+        return Pb / (Dmin * (1 - freqTr))
+    elif freqTr == 0:
+        return 1 - (Pb / (Dmin * freqSS) )
+    elif Dmin == 0:
+        return Pb / (freqSS * (1 - freqTr))
+    elif Pb == 0:
+        return Dmin * freqSS * (1 - freqTr)
+    else:
+        raise ValueError("freqEval() invalid use.")
+    
+    
+    

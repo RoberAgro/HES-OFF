@@ -48,4 +48,4 @@ myESList = [elgev.ES(_outMax, _outMin, _powerIn) for (_outMax, _outMin, _powerIn
 myTestLDs = [(36.8e6, 6.8e6, 7e6, 39e6)]
 myLDList = [elgev.LD(_continuous, _largest, _flexible, _powerIn) for (_continuous, _largest, _flexible, _powerIn) in myTestLDs]
 
-elgev.elgridEval(0.02, -0.02, myGTList, myWTList, myESList, myLDList)
+elgev.elgridEval(myGTList, myWTList, myESList, myLDList)
