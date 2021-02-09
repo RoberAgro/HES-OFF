@@ -1,7 +1,7 @@
 ''' Module with classes and methods to evaluate the electrical grid '''
 
 import numpy as np
-
+from collections import namedtuple
 
 class ES:
     '''
@@ -71,9 +71,6 @@ class GT:
         Minimum power ouput in Watts.
     outMax : float
         Maximum power ouput in Watts.
-    powerOut : float
-        Current power ouput in Watts.
-        If = 0, switches off GT. Otherwise, outMin <= powerOut <=outMax
 
     Attributes
     ----------
@@ -83,6 +80,11 @@ class GT:
         Inertia constant of the turbogenerator in seconds.
     rocP : float
         Maximum rate of change of power in per unit of powerRated per second.
+    damping : float
+        Current damping / P(f) droop in per unit of powerRated per per unit of rated frequency
+    powerOut : float
+        Current power ouput in Watts.
+        If = 0, switches off GT. Otherwise, outMin <= powerOut <=outMax
     
     '''
 
@@ -98,6 +100,7 @@ class GT:
             raise ValueError("GT min or max output are invalid.") 
         
         self.powerOut = powerOut
+        self.setdamping(0,0)
 
     def minmaxValid(self, outMin, outMax):
         '''
@@ -117,7 +120,39 @@ class GT:
         True or False
 
         '''
+
         return (outMin <= outMax) and (outMax <= self.powerRated)
+    
+    def setdamping(self, freqMin, freqMax):
+        '''
+        Set damping based on the current values for outMin and outMax.
+        If freqMin = freqMax, then damping = 0. 
+
+        Parameters
+        ----------
+        freqMin : float
+            Minimum frequency deviation in per unit.
+            Must be <= 0. 
+        freqMax : float
+            Maximum frequency deviation in per unit.
+            Must be >= 0. 
+
+        Returns
+        ----------
+        damping : float
+
+        '''
+
+        if (freqMin > 0) or (freqMax < 0):
+            raise ValueError("GT.setdamping() invalid use.")
+
+        if (freqMin == freqMax):
+            self.__damping = 0 
+        else:
+            self.__damping = (self.outMax - self.outMin) / self.powerRated / (freqMax - freqMin)
+            
+        return self.damping
+
 
     @property
     def model(self):
@@ -178,6 +213,10 @@ class GT:
     @property
     def rocP(self):
         return self.__rocP
+
+    @property
+    def damping(self):
+        return self.__damping
     
     @property
     def powerOut(self):
@@ -383,16 +422,13 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
     # Calculation of GTs aggregated values     
     powerGTpu = 0
     inertiaGTpu = 0
-    rocPGTpu = 1e20
     dampGTpu = 0
     for _ in GT:
         powerGTpu += _.powerOut
         inertiaGTpu += _.inertia * _.powerRated
-        rocPGTpu = min(rocPGTpu, _.rocP * _.powerRated)
-        dampGTpu = (_.outMax - _.outMin) / ( 2*max(-freqSSMin, freqSSMax) )
+        dampGTpu += _.setdamping(freqSSMin, freqSSMax) * _.powerRated
     powerGTpu /= SBASE
     inertiaGTpu /= SBASE
-    rocPGTpu /= SBASE
     dampGTpu /= SBASE
         
     # Calculation of WTs aggregated values     
@@ -437,18 +473,45 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
 
     # Check worst negative power imbalance (load > generation)
     PbNeg = max(PbNegWT, PbNegES, PbNegLD)
-    
     PbNegMax = freqEval(freqSS=-freqSSMin, freqTr=-freqTrMin, Dmin=dampGTpu)
-    
-    print(PbNeg)
-    print(PbNegMax)
+    freqMinOk = PbNeg < PbNegMax
+    freqMinCalc = -freqEval(freqTr=-freqTrMin, Dmin=dampGTpu, Pb=PbNeg)
 
     # Check worst positive power imbalance (load < generation)
     PbPos = max(PbPosES, PbPosLD)
     PbPosMax = freqEval(freqSS=freqSSMax, freqTr=freqTrMax, Dmin=dampGTpu)
+    freqMaxOk = PbPos < PbPosMax
+    freqMaxCalc = freqEval(freqTr=freqTrMax, Dmin=dampGTpu, Pb=PbPos)
 
-    print(PbPos)
-    print(PbPosMax)
+    # Check if GTs rocP are within the allowed limits
+    rocFreq = dampGTpu / inertiaGTpu
+    print(dampGTpu, inertiaGTpu, rocFreq)
+    rocPOk = True
+    rocPMax = 0
+    rocPGT = []
+    for _ in GT:
+        rocPGT.append(_.damping * rocFreq) 
+        rocPOk = rocPOk and (rocPGT[-1] < _.rocP)
+        rocPMax = max(rocPMax, rocPGT[-1])
+        print(_.damping, rocPGT[-1], rocPOk)
+
+    print(rocPMax)        
+    # Return results
+    Desc = namedtuple("Desc", ["freqOk", "freqMinOk", "freqMinCalc", "freqMaxOk", "freqMaxCalc", "rocPOk", "rocPGT"])
+    
+    return Desc(
+        freqMinOk and freqMaxOk,
+        freqMinOk,
+        freqMinCalc,
+        freqMaxOk,
+        freqMaxCalc,
+        rocPOk,
+        rocPGT
+    )
+    
+
+    
+
         
         
 def freqEval(freqSS=0, freqTr=0, Dmin=0, Pb=0):
