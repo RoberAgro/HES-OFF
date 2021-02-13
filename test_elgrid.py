@@ -45,7 +45,10 @@ myWTList = [elgev.WT(_model, _windSpeed) for (_model, _windSpeed) in myTestWTs]
 myTestESs = [(6e6, 0, 1.3478e6), (0, 2.5e6, 0)]
 myESList = [elgev.ES(_outMax, _outMin, _powerIn) for (_outMax, _outMin, _powerIn) in myTestESs]
 
-myTestLDs = [(36.8e6, 6.8e6, 7e6, 39e6)]
+myTestLDs = [(36.8e6, 16.8e6, 7e6, 21e6)]
 myLDList = [elgev.LD(_continuous, _largest, _flexible, _powerIn) for (_continuous, _largest, _flexible, _powerIn) in myTestLDs]
 
 testelgridEval = elgev.elgridEval(myGTList, myWTList, myESList, myLDList)
+
+print(testelgridEval)
+print(testelgridEval.freqOk)

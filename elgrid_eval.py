@@ -243,6 +243,9 @@ class LD:
         Installed power of flexible loads in Watts.        
     powerIn : float
         Current active power demand in Watts.                    
+    damping : float
+        Current damping / P(f) droop in per unit of flexible per per unit of rated frequency
+        
     '''
     def __init__(self, continuous, largest, flexible, powerIn=0.0):
         self.__initComplete = False
@@ -252,6 +255,37 @@ class LD:
         self.powerIn = powerIn
 
         self.__initComplete = True
+
+    def setdamping(self, freqMin, freqMax):
+        '''
+        Set damping based on the current values for flexible.
+        If freqMin = freqMax, then damping = 0. 
+
+        Parameters
+        ----------
+        freqMin : float
+            Minimum frequency deviation in per unit.
+            Must be <= 0. 
+        freqMax : float
+            Maximum frequency deviation in per unit.
+            Must be >= 0. 
+
+        Returns
+        ----------
+        damping : float
+
+        '''
+
+        if (freqMin > 0) or (freqMax < 0):
+            raise ValueError("LD.setdamping() invalid use.")
+
+        if (freqMin == freqMax):
+            self.__damping = 0 
+        else:
+            self.__damping = 1 / (freqMax - freqMin)
+            
+        return self.damping
+
 
     @property
     def continuous(self):
@@ -292,6 +326,10 @@ class LD:
         elif powerIn > (self.continuous + self.flexible):
             raise ValueError("LD powerIn is invalid.")
         self.__powerIn = powerIn
+
+    @property
+    def damping(self):
+        return self.__damping
 
 
 class WT:
@@ -394,13 +432,13 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
     Parameters
     ----------
     freqSSMax: float
-        Maximum steady-state frequency deviation allowed in per unit.
+        Maximum allowed steady-state frequency deviation in per unit.
     freqSSMin: float
-        Minimum steady-state frequency deviation allowed in per unit.        
+        Minimum allowed steady-state frequency deviation in per unit.        
     freqTrMax: float
-        Maximum transient frequency deviation allowed in per unit.
+        Maximum allowed transient frequency deviation in per unit.
     freqTrMin: float
-        Minimum transient frequency deviation allowed in per unit.        
+        Minimum allowed transient frequency deviation in per unit.        
     GT : GT
         Array of gas turbine objects.
     WT : WT
@@ -412,8 +450,22 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
 
     Returns
     ----------
-    True or False
-
+    freqOk: bool
+        if True, the grid is frequency stable (freqSSMin <= frequency <= freqSSMax).
+    freqMinOk: bool
+        if True, the grid is frequency stable for the largest load increase or generation reduction (freqSSMin <= frequency).
+    freqMinCalc: float
+        Minimum calculated steady-state frequency deviation in per unit.
+    freqMaxOk: bool
+        if True, the grid is frequency stable for the largest load reduction or generation increse (frequency <= freqSSMax).
+    freqMaxCalc: float
+        Maximum calculated steady-state frequency deviation in per unit.
+    rocPOk: bool (not implemented)
+        if True, the largest rate of change of active power (rocP) of all gas turbines is below their allowed limits.
+    rocPGT: float (not implemented)
+        list with the calculated rocP of each GT object in pu per second. 
+   
+ 
     '''
     
     # Base power in MVA for per unit (pu) / normalization
@@ -458,6 +510,7 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
     powerLDpu = 0
     PbNegLD = 0
     PbPosLD = 0
+    dampLDpu = 0
     for _ in LD:
         powerLDpu += _.powerIn
         if _.powerIn > (_.continuous - _.largest):
@@ -466,16 +519,18 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
         else:
             PbPosLD = max(PbPosLD, _.powerIn)
             PbNegLD = max(PbNegLD, _.largest)
+        dampLDpu += _.setdamping(freqSSMin, freqSSMax) * _.flexible
 
     powerLDpu /= SBASE
     PbNegLD /= SBASE 
     PbPosLD /= SBASE
+    dampLDpu /= SBASE
 
     # Check worst negative power imbalance (load > generation)
     PbNeg = max(PbNegWT, PbNegES, PbNegLD)
-    PbNegMax = freqEval(freqSS=-freqSSMin, freqTr=-freqTrMin, Dmin=dampGTpu)
+    PbNegMax = freqEval(freqSS=-freqSSMin, freqTr=-freqTrMin, Dmin=(dampGTpu + dampLDpu))
     freqMinOk = PbNeg < PbNegMax
-    freqMinCalc = -freqEval(freqTr=-freqTrMin, Dmin=dampGTpu, Pb=PbNeg)
+    freqMinCalc = -freqEval(freqTr=-freqTrMin, Dmin=(dampGTpu + dampLDpu), Pb=PbNeg)
 
     # Check worst positive power imbalance (load < generation)
     PbPos = max(PbPosES, PbPosLD)
@@ -483,19 +538,18 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
     freqMaxOk = PbPos < PbPosMax
     freqMaxCalc = freqEval(freqTr=freqTrMax, Dmin=dampGTpu, Pb=PbPos)
 
-    # Check if GTs rocP are within the allowed limits
-    rocFreq = dampGTpu / inertiaGTpu
-    print(dampGTpu, inertiaGTpu, rocFreq)
+    # TO-DO: Check if GTs rocP are within the allowed limits
+    rocFreq = (dampGTpu + dampLDpu) / inertiaGTpu
     rocPOk = True
     rocPMax = 0
     rocPGT = []
+    '''
     for _ in GT:
         rocPGT.append(_.damping * rocFreq) 
         rocPOk = rocPOk and (rocPGT[-1] < _.rocP)
         rocPMax = max(rocPMax, rocPGT[-1])
-        print(_.damping, rocPGT[-1], rocPOk)
-
-    print(rocPMax)        
+    '''
+    
     # Return results
     Desc = namedtuple("Desc", ["freqOk", "freqMinOk", "freqMinCalc", "freqMaxOk", "freqMaxCalc", "rocPOk", "rocPGT"])
     
@@ -508,10 +562,6 @@ def elgridEval(GT, WT, ES, LD, freqSSMax=0.02, freqSSMin=-0.02, freqTrMax=0.05, 
         rocPOk,
         rocPGT
     )
-    
-
-    
-
         
         
 def freqEval(freqSS=0, freqTr=0, Dmin=0, Pb=0):
