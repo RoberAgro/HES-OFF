@@ -17,5 +17,4 @@
 git add *.py *.md
 git add *.sh
 #git add *.txt
-git add docs
-#git add projects/matching_cases
+#git add docs

@@ -117,7 +117,7 @@ class HesOffForm(flask_wtf.FlaskForm):
         render_kw={"data-bs-toggle": "tooltip",
                    "data-bs-placement": "right",
                    "title": "Specify the model of the gas turbines"},
-        choices=["", "LM2500+G4","LM6000-PF"],
+        choices=[("", ""), ("LM2500+G4", "LM2500+G4 (32 MW)"), ("LM6000-PF", "LM6000-PF (42 MW)")],
         validators=[wtf.validators.InputRequired()])
 
     GT_UNITS = wtf.DecimalField(
@@ -144,7 +144,7 @@ class HesOffForm(flask_wtf.FlaskForm):
         render_kw={"data-bs-toggle": "tooltip",
                    "data-bs-placement": "right",
                    "title": "Specify the model of the wind turbines"},
-        choices=["", "HYWIND", "NREL"],
+        choices=[("", ""), ("HYWIND", "Hywind"), ("NREL", "NREL")],
         validators=[wtf.validators.InputRequired()])
 
     WT_RATED_POWER = wtf.DecimalField(
@@ -179,7 +179,7 @@ class HesOffForm(flask_wtf.FlaskForm):
         render_kw={"data-bs-toggle": "tooltip",
                    "data-bs-placement": "right",
                    "title": "Specify the name of the file containing the wind speed data"},
-        choices=["", "SLEIPNERWIND"],
+        choices=[("", ""), ("SLEIPNERWIND", "Sleipner wind")],
         validators=[wtf.validators.InputRequired()])
 
     # Electrolyzer specifications
@@ -188,7 +188,7 @@ class HesOffForm(flask_wtf.FlaskForm):
         render_kw={"data-bs-toggle": "tooltip",
                    "data-bs-placement": "right",
                    "title": "Specify the model of the electrolyzer system"},
-        choices=["", "NEL_HYDROGEN"],
+        choices=[("", ""), ("NEL_HYDROGEN", "Nel Hydrogen")],
         # choices=["", "NEL_HYDROGEN", "POLYNOMIAL_EFFICIENCY"],
         validators=[wtf.validators.InputRequired()])
 
@@ -213,7 +213,7 @@ class HesOffForm(flask_wtf.FlaskForm):
         render_kw={"data-bs-toggle": "tooltip",
                    "data-bs-placement": "right",
                    "title": "Specify the model of the fuel cell system"},
-        choices=["", "POWERCELL_S3"],
+        choices=[("", ""), ("POWERCELL_S3", "PowerCell S3")],
         # choices=["", "POWERCELL_S3", "POLYNOMIAL_EFFICIENCY"],
         validators=[wtf.validators.InputRequired()])
 
