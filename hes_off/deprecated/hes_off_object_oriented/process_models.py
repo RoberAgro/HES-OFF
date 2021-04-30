@@ -32,7 +32,7 @@ def read_wind_data(filename):
 
     # Load wind data file
     if filename == "SLEIPNERWIND":
-        mat_data = loadmat(files('hes_off.deprecated.hes_off_object_oriented.data_files').joinpath("sleipnerwind.mat"))
+        mat_data = loadmat(files('hes_off.data_files').joinpath("sleipnerwind.mat"))
     else:
         mat_data = loadmat(filename)
 
