@@ -1,6 +1,6 @@
 # Import packages
 import os
-import hes_off
+import hes_off_core
 import importlib_resources
 
 from flask import render_template, request
@@ -35,8 +35,8 @@ def gui():
 
     # Load default configuration file and update fields
     if request.method == "POST" and form.DEFAULT.data:
-        filename = importlib_resources.files("hes_off.data_files").joinpath("default.cfg")
-        field_dict = hes_off.read_configuration_file(filename)
+        filename = importlib_resources.files("hes_off_core.data_files").joinpath("default.cfg")
+        field_dict = hes_off_core.read_configuration_file(filename)
         form = update_form_from_dict(form, field_dict)
 
     # Load user-defined configuration file and update fields
@@ -45,13 +45,13 @@ def gui():
         if file_allowed(file.filename, app.config["UPLOAD_EXTENSIONS"]):
             filename = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
             file.save(filename)
-            field_dict = hes_off.read_configuration_file(filename)
+            field_dict = hes_off_core.read_configuration_file(filename)
             form = update_form_from_dict(form, field_dict)
 
     # Get the data stored in the form and perform computations
     if request.method == "POST" and (form.COMPUTE.data or form.PLOTS.data) and form.validate():
         field_dict = create_dict_from_form(form)
-        EnergySystem = hes_off.IntegratedModel(field_dict)
+        EnergySystem = hes_off_core.IntegratedModel(field_dict)
         EnergySystem.evaluate_process_model()
         data_dict = create_data_dict(EnergySystem)
         if form.PLOTS.data:

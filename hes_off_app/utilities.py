@@ -80,7 +80,7 @@ def initialize_plot_dict():
     plot_dict["CO2_EMISSIONS"] = ["CO<sub>2</sub>&nbsp;emissions graph", ""]
     plot_dict["H2_LEVEL"]      = ["Hydrogen level graph", ""]
     plot_dict["POWER_DEFICIT"] = ["Power deficit graph", ""]
-    plot_dict["WIND_SPEED"]    = ["Wind speed graph", ""]
+    # plot_dict["WIND_SPEED"]    = ["Wind speed graph", ""]
     # plot_dict["POWER_BALANCE"]    = ["Power balance graph", ""]
     return plot_dict
 
@@ -91,7 +91,7 @@ def create_plot_dict(EnergySystem):
     plot_dict["CO2_EMISSIONS"][-1] = EnergySystem.plot_carbon_dioxide_emissions()
     plot_dict["H2_LEVEL"][-1]      = EnergySystem.plot_hydrogen_level()
     plot_dict["POWER_DEFICIT"][-1] = EnergySystem.plot_power_deficit()
-    plot_dict["WIND_SPEED"][-1]    = EnergySystem.plot_wind_timeseries()
+    # plot_dict["WIND_SPEED"][-1]    = EnergySystem.plot_wind_timeseries()
     # plot_dict["POWER_BALANCE"][-1]    = EnergySystem.plot_power_balance()
     plot_dict = {key:[label,convert_fig_to_svg(value)] for key, (label, value) in plot_dict.items()}
     return plot_dict

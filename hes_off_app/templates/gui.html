@@ -99,6 +99,14 @@
                 </div>
             </div>
 
+
+            <!-- Display figures on click (dirty fix) -->
+            {% if form.PLOTS.data %}
+                {% set show = "show" %}
+            {% else %}
+                {% set show = "" %}
+            {% endif %}
+
             <!-- Output figures -->
             <div class="accordion">
                 {% for key, (label, fig) in plot_dict.items() %}
@@ -107,7 +115,7 @@
                         <h2 class="accordion-header">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ID}}"> {{label|safe}} </button>
                         </h2>
-                        <div id="{{ID}}" class="accordion-collapse collapse">
+                        <div id="{{ID}}" class="accordion-collapse collapse {{show}}">
                             <div class="accordion-body text-center">
                                 <img src="{{ fig }}" width="95%">
                             </div>
@@ -115,7 +123,6 @@
                     </div>
                 {% endfor %}
             </div>
-
 
 
         </div>
