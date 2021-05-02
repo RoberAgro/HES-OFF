@@ -27,3 +27,61 @@ It is planned to create a comprehensive documentation page using [Read the Docs.
 
 The `hes_off` package is licensed under the terms of the MIT license. See the [license file](LICENSE.md) for more information.
 
+
+
+
+
+# Requirements
+Create a Conda environment from .yml to install dependencies
+
+​	conda env create environment.yml
+
+
+
+Create a list of requirements for the Heroku deployment
+
+​		pip list --format=freeze > requirements.txt
+
+
+
+
+
+Create Heroku account online
+
+https://dashboard.heroku.com/apps
+
+
+
+Install the command line interface (CLI):
+
+https://devcenter.heroku.com/articles/heroku-cli
+
+
+
+Create "Procfile" in the app root directory:
+
+```shell
+echo "web: gunicorn app:app" > Procfile
+```
+
+
+
+Push the heroku app
+
+```
+git push heroku main
+```
+
+
+
+
+
+
+
+https://stackoverflow.com/questions/47304291/heroku-upload-could-not-find-a-version-that-satisfies-the-requirement-anaconda/56754565
+
+Remove items in requirements.txt if necessary
+
+
+
+
