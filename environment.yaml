@@ -12,6 +12,7 @@ dependencies:
       - scipy
       - matplotlib
       - numba
+      - pyyaml
       - importlib_resources
       - flask
       - flask-wtf

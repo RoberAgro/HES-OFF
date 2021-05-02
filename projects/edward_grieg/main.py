@@ -46,13 +46,12 @@ with hes_off_core.Timer():
 print(EdwardGrieg.CO2_emissions/1e9)
 
 
-# EdwardGrieg.plot_hydrogen_level()
-# EdwardGrieg.plot_hydrogen_balance()
-# EdwardGrieg.plot_power_balance()
-# EdwardGrieg.plot_power_deficit()
-# EdwardGrieg.plot_carbon_dioxide_emissions()
-
-
+a =EdwardGrieg.plot_hydrogen_level()
+EdwardGrieg.plot_hydrogen_balance()
+EdwardGrieg.plot_power_balance()
+EdwardGrieg.plot_power_deficit()
+EdwardGrieg.plot_carbon_dioxide_emissions()
+# a.savefig("test.png")
 plt.show()
 
 
@@ -90,8 +89,6 @@ plt.show()
 
 
 
-
-plt.show()
 # #
 #
 #
