@@ -26,32 +26,39 @@
 
             <!-- Input fields -->
             {% for field in form %}
-            <div class="row">
-                <div class="col-11 pad">
-                    <div class="input-group">
-
-                        {% if field.name in ["HEAT_DEMAND", "POWER_DEMAND", "STAGE_LENGTH"] %}
-                            <div class="col-6"> <span class="input-group-text">{{field[0].label}}</span> </div>
-                            {% for stage in ["Peak", "Midlife", "Tail"] %}
-                                {{ field[loop.index0](placeholder=stage, class="form-control", style="text-align:center") }}
-                            {% endfor %}
-                        {% elif field.type == "SelectField" %}
-                            <div class="col-6"> <span class="input-group-text">{{field.label}}</span> </div>
-                            {{ field(class="form-select", style="text-align-last:center") }}
-                        {% elif field.type == "DecimalField" %}
-                            <div class="col-6"> <span class="input-group-text">{{field.label}}</span> </div>
-                            {{ field(class="form-control", style="text-align:center") }}
-                        {% endif %}
-
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                            <span class="myErrors"> {{ error }} </span>
-                            {% endfor %}
-                        {% endif %}
-
+                <div class="row">
+                    <div class="col-11 pad">
+                        <div class="input-group">
+                            {% if field.name in ["HEAT_DEMAND", "POWER_DEMAND", "STAGE_LENGTH"] %}
+                                <div class="col-6"> <span class="input-group-text">{{field[0].label}}</span> </div>
+                                {% for stage in ["Peak", "Midlife", "Tail"] %}
+                                    {{ field[loop.index0](placeholder=stage, class="form-control", style="text-align:center") }}
+                                {% endfor %}
+                            {% elif field.type == "SelectField" %}
+                                <div class="col-6"> <span class="input-group-text">{{field.label}}</span> </div>
+                                {{ field(class="form-select", style="text-align-last:center") }}
+                            {% elif field.type == "DecimalField" %}
+                                <div class="col-6"> <span class="input-group-text">{{field.label}}</span> </div>
+                                {{ field(class="form-control", style="text-align:center") }}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                {% if field.errors %}
+                <div class="row">
+                    <div class="col-11 pad">
+                        <div class="input-group">
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
             {% endfor %}
 
         </div>
