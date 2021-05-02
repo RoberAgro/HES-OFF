@@ -1,4 +1,4 @@
 **/__pycache__/
-!hes_off_core/__pycache__/
+#!hes_off_core/__pycache__/
 .idea/
 docs/
