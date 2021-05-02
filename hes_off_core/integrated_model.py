@@ -1,18 +1,20 @@
 import pdb
 import copy
 import numpy as np
+from importlib_resources import files
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 from matplotlib.figure import  Figure
 
 from .utilities import *
 from .process_model import *
 
 # Define font settings
-fontsize = 13
-plt.rc('text', usetex=False)
-plt.rcParams['font.family']      = 'sans-serif'                # 'serif', 'sans-serif', 'cursive', 'fantasy', 'monospace'
-plt.rcParams['font.sans-serif']  = ["Calibri", "Arial", "Verdana"]      # 'cmr10', 'palatino', 'times new roman'
-# plt.rcParams['mathtext.fontset'] = 'calibri'                 # 'cm' (latex style), 'stix' (times new roman style), 'stixsans'
+fontsize = 12
+font_files = font_manager.findSystemFonts(fontpaths=[files('hes_off_core').joinpath("fonts")])
+for font_file in font_files:
+    font_manager.fontManager.addfont(font_file)
+plt.rcParams['font.family'] = 'Arial'
 
 
 class IntegratedModel:
