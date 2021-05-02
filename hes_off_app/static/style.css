@@ -1,51 +1,10 @@
-
-.label {
-  display: inline-block;
-  color: black;
-  width: 30%;
+body {
+  font-family: "Arial", sans-serif;
 }
-
-.myInputList {
-  display: inline-block;
-  width : 80px;
-  padding: 0;
-  margin: 0px 1px;
-  border: thin solid darkgrey;
-  border-radius: 5px;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.myInput {
-  display: inline-block;
-  width : calc(3*80px + 12px);
-  padding: 0;
-  margin: 0px 1px;
-  border: thin solid darkgrey;
-  border-radius: 5px;
-  border-color: darkgray;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.myLabel {
-  display: inline-block;
-  font-weight: bold;
-  width : 250px;
-  padding: 0;
-  padding-right: 0em;
-  margin: 0;
-  text-align: left;
-  box-sizing: border-box;
-}
-
 
 .myErrors {
   color: red;
 }
-
-
-
 
 .navbar{
 padding-left:+20px;
@@ -53,18 +12,9 @@ padding-right:+20px;
 }
 
 .container-fluid{
-width: 85%;
+width: 88%;
 }
-
 
 .pad {
     padding: 2px 2px 2px 2px;
-}
-
-.pad-left {
-    padding-left: 20px;
-}
-
-.pad-right {
-    padding-right: 20px;
 }
