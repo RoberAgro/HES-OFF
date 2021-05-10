@@ -1,25 +1,51 @@
 # HES-OFF
 ## Description
 
-A research-based prototype tool in Python
+Despite the efforts to move towards a carbon-neutral future, the global demand of fossil fuels continues to grow.  As a result, the oil and gas (O&G) industry if facing a double challenge: meet the increased need for energy while simultaneously reducing its overall emissions. One way to achieve these goals is through the use of hybrid energy systems that combine renewable energies with conventional power generation.
 
-## Installation
+In this context, `HES-OFF` Python package offers a platform-independent environment for the simulation of hybrid energy systems for stable heat and power supply in off-shore oil and gas installations. The code was developed aiming at ease of use and computational speed. Some notable features of the package are listed below:
 
-It is planned to add the `hes_off` package to the `pip` and `conda` package managers once the code is more mature. For the time being, it is possible to import the local `hes-off` package if your python script is within the HES-OFF project.
+- Supports the simulation of off-shore energy systems that integrate offshore wind power with gas turbines and an energy storage solution based on proton exchange membrane fuel cells and electrolysers.
 
-If you want to import the `hes_off` package from a python script located anywhere in you computer, you can add the location of the `HES-OFF` project to the `PYTHONPATH` environmental variable. Here are [some instructions](https://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-so-it-finds-my-modules-packages) about how to create and modify environmental variables in Windows OS. In my case, the project was located at `C:\Users\rober\git\HES-OFF` 
+- Contains commercial and user-defined numerical models to simulate the performance of the different system components.
+
+- Includes an intuitive, web-based graphical user interface to perform the simulations and visualize the results.
+  - The backend of the interface was developed using the Flask framework
+  - The frontend of the interface was developed using the Bootstrap framework
+  - The web-based app is currently hosted in the Heroku platform
+  
+- Uses the Numba JIT compiler to achieve execution times comparable with those of compiled languages such as C++ or FORTRAN.
+
+  
 
 ## Getting started
+
+#### Running the all online
+
+There is not need to install anything to start using the online web application! Just [open the app](https://hes-off.herokuapp.com/) and start playing around with the different parameters and settings. The user interface has many tooltips and warnings to guide the users and help them understand what inputs are expected.
+
+#### Running the app locally
+
+If you want to have access to the core functionality of the HES-OFF package, you can install it with [pip](https://pip.pypa.io/en/stable/): 
+
+```bash
+pip install hes_off [pip installer is still missing]
+```
+
+Once the package is installed, you can run the web application locally typing the following command in your terminal:
+
+```shell
+python3 -c "import hes_off; hes_off.launch_app()"
+```
 
 
 
 ## Documentation
 
-It is planned to create a comprehensive documentation page using [Read the Docs.](https://readthedocs.org/)
+To be completed
 
-
-
-## Related publications
+- [ ] Add link to Read the Docs documentation
+- [ ] Add the links to related publications
 
 
 
@@ -29,58 +55,68 @@ The `hes_off` package is licensed under the terms of the MIT license. See the [l
 
 
 
+## Contact information
 
-
-# Requirements
-Create a Conda environment from .yml to install dependencies
-
-​	conda env create environment.yml
+To be completed
 
 
 
-Create a list of requirements for the Heroku deployment
+## To-do list
 
-​		pip list --format=freeze > requirements.txt
-
-
-
-
-
-Create Heroku account online
-
-https://dashboard.heroku.com/apps
-
-
-
-Install the command line interface (CLI):
-
-https://devcenter.heroku.com/articles/heroku-cli
+- [ ] Add option to export Excel files with results (Roberto)
+- [ ] Add option to add a user-defined model for the electrolyzer and fuel cell systems (Roberto)
+- [ ] Prepare some test cases and compare results with MATLAB (Luca)
+- [ ] Prepare a documentation page using  [Read the Docs](https://readthedocs.org/) (Erick)
+- [ ] Implement the electric grid surrogate model (Erick)
+- [ ] Implement a gradient-free optimization for design
+- [ ] Prepare a paper for an open-software journal
+  - [Journal of open-source software](https://joss.theoj.org/)
+  - [Elsevier's SoftwareX journal](https://www.journals.elsevier.com/softwarex/)
 
 
 
-Create "Procfile" in the app root directory:
+## Deployment
 
-```shell
-echo "web: gunicorn app:app" > Procfile
-```
+*This section is intended for developers*
 
+In order to deploy the app you must create a [Heroku account](https://dashboard.heroku.com/apps) and install the [Heroku command line interface](https://devcenter.heroku.com/articles/heroku-cli). Once you are set, open a terminal in the root directory of the project and type the following commands:
 
+1. Create a Conda virtual environment with all the dependencies using the `environment.yml` file:
 
-Push the heroku app
+   ```shell
+   conda env create environment.yml
+   ```
 
-```
-git push heroku main
-```
+2. Check that the app works locally typing this one-liner in your terminal:
 
+   ```shell
+   python3 -c "import hes_off; hes_off.launch_app()"
+   ```
 
+3. If the app works locally, then create a `requirements.txt` file with the list of dependencies:
 
+   ```shell
+   pip list --format=freeze > requirements.txt
+   ```
 
+4. Create the `Procfile` file in case it does not exists already:
 
+   ```shell
+   echo "web: gunicorn app:app" > Procfile
+   ```
 
+5. Deploy the app to Heroku with a Git push;
 
-https://stackoverflow.com/questions/47304291/heroku-upload-could-not-find-a-version-that-satisfies-the-requirement-anaconda/56754565
+   ```shell
+   git push heroku main
+   ```
 
-Remove items in requirements.txt if necessary
+That's it! The app might take some moments to go online.
+
+**Known caveats**
+
+In some cases the `requirements.txt` file might include some unnecessary packages that cause the Heroku deployment to fail. If this is the case, [remove the problematic packages](https://stackoverflow.com/questions/47304291/heroku-upload-could-not-find-a-version-that-satisfies-the-requirement-anaconda/56754565) and try to re-deploy.
+
 
 
 
