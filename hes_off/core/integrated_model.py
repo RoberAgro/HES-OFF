@@ -11,7 +11,7 @@ from .process_model import *
 
 # Define font settings
 fontsize = 12
-font_files = font_manager.findSystemFonts(fontpaths=[files('hes_off_core').joinpath("fonts")])
+font_files = font_manager.findSystemFonts(fontpaths=[files('hes_off.core').joinpath("fonts")])
 for font_file in font_files:
     font_manager.fontManager.addfont(font_file)
 plt.rcParams['font.family'] = 'Arial'
