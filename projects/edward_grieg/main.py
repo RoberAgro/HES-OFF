@@ -17,7 +17,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-import hes_off_core
+import hes_off.core as hes_off_core
 
 
 # # Evaluate the process model (functional with Numba)
@@ -42,6 +42,11 @@ IN = hes_off_core.read_configuration_file("edward_grieg.cfg")
 EdwardGrieg = hes_off_core.IntegratedModel(IN)
 with hes_off_core.Timer():
     EdwardGrieg.evaluate_process_model()
+
+with hes_off_core.Timer():
+    EdwardGrieg.evaluate_process_model()
+
+
 # print("Lifetime CO2 emissions {:0.2f} Mton".format(EdwardGrieg.CO2_emissions / 1e9))
 print(EdwardGrieg.CO2_emissions/1e9)
 
