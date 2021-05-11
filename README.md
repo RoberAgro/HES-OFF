@@ -29,13 +29,13 @@ There is not need to install anything to start using the online web application!
 If you want to have access to the core functionality of the HES-OFF package, you can install it with [pip](https://pip.pypa.io/en/stable/): 
 
 ```bash
-pip3 install hes_off
+pip install hes_off
 ```
 
 Once the package is installed, you can run the web application locally typing the following command in your terminal:
 
 ```shell
-python3 -c "import hes_off; hes_off.launch_app()"
+python -c "import hes_off; hes_off.launch_app()"
 ```
 
 
@@ -96,7 +96,7 @@ In order to add the `hes_off` package to the pip installer, you must create a Py
 3. Upload the package to PyPi using twine (you may need to install twine):
 
     ```shell
-    python3 -m twine upload dist/*
+    python -m twine upload dist/*
     ```
     
 4. Fill in your user name and credentials and wait until the package upload is complete
@@ -118,13 +118,13 @@ In order to deploy the `hes_off` app, you must create a [Heroku account](https:/
 2. Check that the app works locally typing this one-liner in your terminal:
 
    ```shell
-   python3 -c "import hes_off; hes_off.launch_app()"
+   python -c "import hes_off; hes_off.launch_app()"
    ```
 
 3. If the app works locally, then create a `requirements.txt` file with the list of dependencies:
 
    ```shell
-   pip3 list --format=freeze > requirements.txt
+   pip list --format=freeze > requirements.txt
    ```
 
 4. Create the `Procfile` file in case it does not exists already:
