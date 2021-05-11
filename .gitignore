@@ -2,3 +2,6 @@
 #!core/__pycache__/
 .idea/
 docs/
+dist/
+build/
+*egg-info
