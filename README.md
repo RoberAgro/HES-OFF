@@ -29,7 +29,7 @@ There is not need to install anything to start using the online web application!
 If you want to have access to the core functionality of the HES-OFF package, you can install it with [pip](https://pip.pypa.io/en/stable/): 
 
 ```bash
-pip install hes_off [pip installer is still missing]
+pip install hes_off
 ```
 
 Once the package is installed, you can run the web application locally typing the following command in your terminal:
@@ -79,7 +79,7 @@ To be completed
 
 *This section is intended for developers*
 
-In order to deploy the app you must create a [Heroku account](https://dashboard.heroku.com/apps) and install the [Heroku command line interface](https://devcenter.heroku.com/articles/heroku-cli). Once you are set, open a terminal in the root directory of the project and type the following commands:
+In order to deploy the app you must create a [Heroku account](https://dashboard.heroku.com/apps) and install the [Heroku command line interface](https://devcenter.heroku.com/articles/heroku-cli). Once you are set, open a terminal in the project's root directory and type the following commands:
 
 1. Create a Conda virtual environment with all the dependencies using the `environment.yml` file:
 
@@ -118,6 +118,12 @@ That's it! The app might take some moments to go online.
 In some cases the `requirements.txt` file might include some unnecessary packages that cause the Heroku deployment to fail. If this is the case, [remove the problematic packages](https://stackoverflow.com/questions/47304291/heroku-upload-could-not-find-a-version-that-satisfies-the-requirement-anaconda/56754565) and try to re-deploy.
 
 
+
+
+
+```
+python setup.py sdist bdist_wheel
+```
 
 
 
