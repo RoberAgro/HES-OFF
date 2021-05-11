@@ -90,7 +90,7 @@ In order to add the `hes_off` package to the pip installer, you must create a Py
 2. Create a source archive and a wheel for your package:
 
     ```shell
-    python3 setup.py sdist bdist_wheel
+    python setup.py sdist bdist_wheel
     ```
 
 3. Upload the package to PyPi using twine (you may need to install twine):
