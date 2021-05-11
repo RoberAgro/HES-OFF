@@ -16,7 +16,7 @@ with open("README.md", "r") as fh:
 # Configure setup
 setuptools.setup(
     name="hes_off",
-    version="1.0.0",
+    version="1.0.1",
     author="Roberto Agromayor",
     author_email="rober.agro@gmail.com",
     description="A package for the simulation of hybrid energy systems for off-shore oil and gas installations.",
@@ -29,5 +29,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
     ],
     install_requires=install_requires,
+    include_package_data=True,
     python_requires='>=3',
 )
