@@ -1,0 +1,20 @@
+# Run "conda env create" to create a new Conda environment from .yml file
+
+# Environment name
+name: hes_off
+
+# Packages to install
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - numpy
+      - scipy
+      - matplotlib
+      - numba
+      - pyyaml
+      - importlib_resources
+      - flask
+      - flask-wtf
+      - gunicorn
+

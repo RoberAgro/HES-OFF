@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+<div class="container-fluid">
+    <form action="" method=post enctype="multipart/form-data">
+
+
+    <div class="row">
+
+        <div class="col-12"> <hr> </div>
+
+        <!-- Input area -->
+        <div class="col-6">
+
+            <!-- UI buttons -->
+            <div class="row">
+                <div class="col-11 pad">
+                    <div class="input-group gap-2">
+                        <div class="col-3 d-grid"> {{ form.DEFAULT(class="btn btn-primary fw-bold") }}  </div>
+                        <div class="col-3 d-grid"> {{ form.UPLOAD(class="btn btn-primary fw-bold") }}  </div>
+                        {{ form.INPUT_FILE(class="form-control ") }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input fields -->
+            {% for field in form %}
+                <div class="row">
+                    <div class="col-11 pad">
+                        <div class="input-group">
+                            {% if field.name in ["HEAT_DEMAND", "POWER_DEMAND", "STAGE_LENGTH"] %}
+                                <div class="col-6"> <span class="input-group-text">{{field[0].label}}</span> </div>
+                                {% for stage in ["Peak", "Midlife", "Tail"] %}
+                                    {{ field[loop.index0](placeholder=stage, class="form-control", style="text-align:center") }}
+                                {% endfor %}
+                            {% elif field.type == "SelectField" %}
+                                <div class="col-6"> <span class="input-group-text">{{field.label}}</span> </div>
+                                {{ field(class="form-select", style="text-align-last:center") }}
+                            {% elif field.type == "DecimalField" %}
+                                <div class="col-6"> <span class="input-group-text">{{field.label}}</span> </div>
+                                {{ field(class="form-control", style="text-align:center") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if field.errors %}
+                <div class="row">
+                    <div class="col-11 pad">
+                        <div class="input-group">
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+        <!--Output area-->
+        <div class="col-6">
+
+
+            <!-- UI buttons -->
+            <div class="row">
+                <div class="col-12 pad">
+                    <div class="input-group gap-2">
+                        <div class="col-12 d-grid mb-3"> {{ form.COMPUTE(class="btn btn-primary fw-bold") }}  </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output results -->
+            {% for key, (label, tooltip, data) in data_dict.items() %}
+            <div class="row">
+                <div class="col-12 pad">
+                    <div class="input-group">
+                            <div class="col-4"> <span class="input-group-text" data-bs-toggle="tooltip" data-bs-placement="left" title="{{tooltip}}"> {{label|safe}} </span> </div>
+                            {% for item in data %}
+                                {% if key == "energy_deficit" and item|float > 0.0 %}
+                                    <span class="form-control text-center bg-danger text-black fw-bold"> {{item}} </span>
+                                {% else %}
+                                    <span class="form-control text-center"> {{item}} </span>
+                                {% endif %}
+                            {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Break line -->
+            <div class="col-12"> <hr> </div>
+
+            <!-- UI buttons -->
+            <div class="row">
+                <div class="col-12 pad">
+                    <div class="input-group gap-2">
+                        <div class="col-12 d-grid mb-3"> {{ form.PLOTS(class="btn btn-primary fw-bold") }}  </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Display figures on click (dirty fix) -->
+            {% if form.PLOTS.data %}
+                {% set show = "show" %}
+            {% else %}
+                {% set show = "" %}
+            {% endif %}
+
+            <!-- Output figures -->
+            <div class="accordion">
+                {% for key, (label, fig) in plot_dict.items() %}
+                    {% set ID = "id" + loop.index0|string %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ID}}"> {{label|safe}} </button>
+                        </h2>
+                        <div id="{{ID}}" class="accordion-collapse collapse {{show}}">
+                            <div class="accordion-body text-center">
+                                <img src="{{ fig }}" width="95%">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+
+        </div>
+
+    </div>
+    </form>
+
+</div>
+
+{% endblock %}
