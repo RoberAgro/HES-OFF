@@ -16,6 +16,7 @@ MW_CO2 = 44.01/1e3
 @nb.jit(nopython=True, cache=True)
 def evaluate_process_model(HEAT_DEMAND, POWER_DEMAND,
                            GT_MODEL, GT_UNITS, GT_MAX_H2,
+                           HEAT_OPTION,
                            WT_MODEL, WT_RATED_POWER, WT_REF_HEIGHT, WT_HUB_HEIGHT,
                            EL_MODEL, EL_RATED_POWER, EL_EFFICIENCY,
                            FC_MODEL, FC_RATED_POWER, FC_EFFICIENCY,
@@ -62,7 +63,12 @@ def evaluate_process_model(HEAT_DEMAND, POWER_DEMAND,
         H2_level[p, 0] = H2_CAPACITY * H2_INITIAL_LEVEL
 
         # Compute the minimum GT load required to satisfy the heat demand
-        GT_power_min = compute_GT_power_from_heat(model=GT_MODEL, number_of_units=GT_UNITS, heat_output=heat_demand)[0]
+        if HEAT_OPTION == 'WHRU':
+            GT_power_min = compute_GT_power_from_heat(model=GT_MODEL, number_of_units=GT_UNITS, heat_output=heat_demand)[0]
+        elif HEAT_OPTION == 'EL_HEATER':
+            GT_power_min = 0
+            power_demand += heat_demand/0.95
+        # GT_power_min = compute_GT_power_from_heat(model=GT_MODEL, number_of_units=GT_UNITS, heat_output=heat_demand)[0]
 
         # Compute the maximum GT load of the current GT model
         GT_power_max = compute_GT_maximum_power(model=GT_MODEL, number_of_units=GT_UNITS)

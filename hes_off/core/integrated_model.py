@@ -39,6 +39,9 @@ class IntegratedModel:
         self.GT_UNITS = self.IN["GT_UNITS"]
         self.GT_MAX_H2 = self.IN["GT_MAX_H2"]/100
 
+        # Heating option specifications
+        self.HEAT_OPTION = self.IN["HEAT_OPTION"]
+
         # Wind farm specifications
         self.WT_MODEL = self.IN["WT_MODEL"]
         self.WT_REF_HEIGHT = IN["WT_REF_HEIGHT"]
@@ -153,6 +156,7 @@ class IntegratedModel:
         # Evaluate the process model
         self.process_output = evaluate_process_model(self.HEAT_DEMAND, self.POWER_DEMAND,
                                                      self.GT_MODEL, self.GT_UNITS, self.GT_MAX_H2,
+                                                     self.HEAT_OPTION,
                                                      self.WT_MODEL, self.WT_RATED_POWER,
                                                      self.WT_REF_HEIGHT, self.WT_HUB_HEIGHT,
                                                      self.EL_MODEL, self.EL_RATED_POWER, self.EL_EFFICIENCY,

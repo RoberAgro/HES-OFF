@@ -138,6 +138,15 @@ class HesOffForm(flask_wtf.FlaskForm):
         default=None, places=2,
         validators=[wtf.validators.InputRequired(), wtf.validators.NumberRange(min=0, max=100)])
 
+    # Heating option specifications
+    HEAT_OPTION = wtf.SelectField(
+        label="Heat supply option",
+        render_kw={"data-bs-toggle": "tooltip",
+                   "data-bs-placement": "right",
+                   "title": "Specify the method to supply heat"},
+        choices=[("", ""), ("WHRU", "WHRU"), ("EL_HEATER", "EL_HEATER")],
+        validators=[wtf.validators.InputRequired()])
+
     # Wind turbine specifications
     WT_MODEL = wtf.SelectField(
         label="Wind turbine model",
