@@ -70,6 +70,7 @@ class IntegratedModel:
         self.H2_INITIAL_LEVEL = self.IN["H2_INITIAL_LEVEL"] / 100
         self.H2_RECHARGE_THRESHOLD = self.IN["H2_RECHARGE_THRESHOLD"]/100
         self.H2_COFIRE_THRESHOLD = self.IN["H2_COFIRE_THRESHOLD"]/100
+        self.H2_FC_THRESHOLD = self.IN["H2_FC_THRESHOLD"]/100
 
         # Wind data specifications
         self.WIND_FILENAME = self.IN["WIND_FILENAME"]
@@ -139,8 +140,11 @@ class IntegratedModel:
         if self.H2_COFIRE_THRESHOLD < 0.0 or self.H2_COFIRE_THRESHOLD > 1.00:
             raise Exception("H2_COFIRE_THRESHOLD must be between zero and one")
 
-        if self.H2_COFIRE_THRESHOLD <= self.H2_RECHARGE_THRESHOLD:
+        if self.H2_COFIRE_THRESHOLD < self.H2_RECHARGE_THRESHOLD:
             raise Exception("H2_RECHARGE_THRESHOLD must be lower than H2_COFIRE_THRESHOLD")
+
+        if self.H2_FC_THRESHOLD < 0.0 or self.H2_FC_THRESHOLD > 1.00:
+            raise Exception("H2_FC_THRESHOLD must be between zero and one")
 
         return True
 
@@ -154,7 +158,7 @@ class IntegratedModel:
                                                      self.EL_MODEL, self.EL_RATED_POWER, self.EL_EFFICIENCY,
                                                      self.FC_MODEL, self.FC_RATED_POWER, self.FC_EFFICIENCY,
                                                      self.H2_CAPACITY, self.H2_INITIAL_LEVEL,
-                                                     self.H2_RECHARGE_THRESHOLD, self.H2_COFIRE_THRESHOLD,
+                                                     self.H2_RECHARGE_THRESHOLD, self.H2_COFIRE_THRESHOLD, self.H2_FC_THRESHOLD,
                                                      self.WIND_SPEED, self.WIND_TIME,
                                                      natural_gas, hydrogen)
 

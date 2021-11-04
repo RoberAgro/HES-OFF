@@ -268,3 +268,12 @@ class HesOffForm(flask_wtf.FlaskForm):
                    "title": "Specify the storage level above which hydrogen is co-fired in the gas turbines"},
         default=None, places=2,
         validators=[wtf.validators.InputRequired(), wtf.validators.NumberRange(min=0, max=100), RechargeCofireTest()])
+        
+    H2_FC_THRESHOLD = wtf.DecimalField(
+        label="Hydrogen fuel cell threshold (%)",
+        render_kw={"placeholder": placeholder_percentage,
+                   "data-bs-toggle": "tooltip",
+                   "data-bs-placement": "right",
+                   "title": "Specify the storage level above which hydrogen is used in the fuel cell stack"},
+        default=None, places=2,
+        validators=[wtf.validators.InputRequired(), wtf.validators.NumberRange(min=0, max=100), RechargeCofireTest()])
